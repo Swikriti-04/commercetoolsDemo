@@ -5,16 +5,23 @@ import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+@Configuration
 public class AdminFeignConfig {
 
+    private final TokenService tokenService;
+
+    public AdminFeignConfig(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+
     @Bean
-    public RequestInterceptor adminAuthInterceptor(TokenService tokenService) {
+    public RequestInterceptor adminRequestInterceptor() {
         return requestTemplate -> {
-            String token = tokenService.getAdminToken();
-            requestTemplate.header("Authorization", "Bearer " + token);
+            String accessToken = tokenService.getAdminAccessToken();
+            System.out.println("USING TOKEN = " + accessToken);
+
+            requestTemplate.header("Authorization", "Bearer " + accessToken);
+            requestTemplate.header("Content-Type", "application/json");
         };
     }
 }
-
-

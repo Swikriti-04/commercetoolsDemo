@@ -1,15 +1,14 @@
 package com.example.commercetoolsDemo.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreateOrderRequest {
 
-    private String id;     // cartId
-    private Long version;  // cart version
+    private String cartId;
+    private Long cartVersion;
 }

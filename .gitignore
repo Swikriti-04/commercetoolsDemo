@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+# Ignore invalid Windows temp files
+ts.
+*.tmp
+*.temp
+
