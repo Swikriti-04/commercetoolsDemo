@@ -15,7 +15,6 @@ public class AdminService {
     @Value("${ct.projectKey}")
     private String projectKey;
 
-
     public AdminService(AdminFeignClient adminFeignClient) {
         this.adminFeignClient = adminFeignClient;
     }
@@ -32,10 +31,10 @@ public class AdminService {
         Map<String, Object> response =
                 adminFeignClient.createCustomer(projectKey, body);
 
-        return Map.of(
-                "customerId", response.get("id"),
-                "email", response.get("email")
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("customerId", response.get("id"));
+        result.put("email", response.get("email"));
+        return result;
     }
 
 
@@ -52,11 +51,9 @@ public class AdminService {
         return mapCartResponse(response);
     }
 
-
     public Map<String, Object> addLineItem(String cartId, CartUpdateRequest request) {
         return updateCart(cartId, request, "addLineItem");
     }
-
 
     public Map<String, Object> setShippingAddress(String cartId, CartUpdateRequest request) {
         return updateCart(cartId, request, "setShippingAddress");
@@ -69,19 +66,30 @@ public class AdminService {
 
     public Map<String, Object> createOrder(CreateOrderRequest request) {
 
+        Map<String, Object> cartRef = new HashMap<>();
+        cartRef.put("typeId", "cart");
+        cartRef.put("id", request.getCartId());
+
         Map<String, Object> body = new HashMap<>();
-        body.put("id", request.getCartId());
-        body.put("version", request.getCartVersion());
+        body.put("cart", cartRef);
+        body.put("version", request.getVersion());
 
         Map<String, Object> response =
                 adminFeignClient.createOrder(projectKey, body);
 
-        return Map.of(
-                "orderId", response.get("id"),
-                "orderNumber", response.get("orderNumber"),
-                "orderState", response.get("orderState")
-        );
+        // ✅ NULL-SAFE RESPONSE
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderId", response.get("id"));
+        result.put("orderState", response.get("orderState"));
+
+        if (response.get("orderNumber") != null) {
+            result.put("orderNumber", response.get("orderNumber"));
+        }
+
+        return result;
     }
+
+
 
     private Map<String, Object> updateCart(
             String cartId,
@@ -92,24 +100,28 @@ public class AdminService {
         action.put("action", actionType);
 
         switch (actionType) {
+
             case "addLineItem" -> {
                 action.put("productId", request.getProductId());
+                action.put("variantId", request.getVariantId());
                 action.put("quantity", request.getQuantity());
             }
+
             case "setShippingAddress" -> {
-                action.put("address", Map.of(
-                        "streetName", request.getStreetName(),
-                        "city", request.getCity(),
-                        "state", request.getState(),
-                        "postalCode", request.getPostalCode(),
-                        "country", request.getCountry()
-                ));
+                Map<String, Object> address = new HashMap<>();
+                address.put("streetName", request.getStreetName());
+                address.put("city", request.getCity());
+                address.put("state", request.getState());
+                address.put("postalCode", request.getPostalCode());
+                address.put("country", request.getCountry());
+                action.put("address", address);
             }
+
             case "setShippingMethod" -> {
-                action.put("shippingMethod", Map.of(
-                        "id", request.getShippingMethodId(),
-                        "typeId", "shipping-method"
-                ));
+                Map<String, Object> shippingMethod = new HashMap<>();
+                shippingMethod.put("id", request.getShippingMethodId());
+                shippingMethod.put("typeId", "shipping-method");
+                action.put("shippingMethod", shippingMethod);
             }
         }
 
@@ -123,13 +135,19 @@ public class AdminService {
         return mapCartResponse(response);
     }
 
+
+
     private Map<String, Object> mapCartResponse(Map<String, Object> cart) {
 
-        return Map.of(
-                "cartId", cart.get("id"),
-                "version", cart.get("version"),
-                "totalPrice", ((Map<?, ?>) cart.get("totalPrice")).get("centAmount"),
-                "lineItems", cart.get("lineItems")
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("cartId", cart.get("id"));
+        result.put("version", cart.get("version"));
+
+        if (cart.get("totalPrice") instanceof Map<?, ?> totalPrice) {
+            result.put("totalPrice", totalPrice.get("centAmount"));
+        }
+
+        result.put("lineItems", cart.get("lineItems"));
+        return result;
     }
 }

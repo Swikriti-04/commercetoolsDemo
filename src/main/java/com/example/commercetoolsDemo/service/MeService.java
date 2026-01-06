@@ -45,7 +45,7 @@ public class MeService {
 
         Map<String, Object> body = Map.of(
                 "id", request.getCartId(),
-                "version", request.getCartVersion()
+                "version", request.getVersion()
         );
 
         Map<String, Object> response =
