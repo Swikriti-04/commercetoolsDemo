@@ -1,0 +1,289 @@
+openapi: 3.0.1
+info:
+  title: Commercetools Demo API
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+
+  /admin/customers:
+    post:
+      tags: [admin-controller]
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '200':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /admin/carts:
+    post:
+      tags: [admin-controller]
+      operationId: createCart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCartRequest'
+      responses:
+        '200':
+          description: Cart created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /admin/carts/{cartId}/line-items:
+    post:
+      tags: [admin-controller]
+      operationId: addLineItem
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartUpdateRequest'
+      responses:
+        '200':
+          description: Line item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /admin/carts/{cartId}/shipping-address:
+    post:
+      tags: [admin-controller]
+      operationId: setShippingAddress
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartUpdateRequest'
+      responses:
+        '200':
+          description: Shipping address set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /admin/carts/{cartId}/shipping-method:
+    post:
+      tags: [admin-controller]
+      operationId: setShippingMethod
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartUpdateRequest'
+      responses:
+        '200':
+          description: Shipping method set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /admin/orders:
+    post:
+      tags: [admin-controller]
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+  /me/carts/active:
+    get:
+      tags: [me-controller]
+      operationId: getActiveCart
+      responses:
+        '200':
+          description: Active cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /me/carts/line-items:
+    post:
+      tags: [me-controller]
+      operationId: addLineItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartUpdateRequest'
+      responses:
+        '200':
+          description: Line item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /me/carts/shipping-address:
+    post:
+      tags: [me-controller]
+      operationId: setShippingAddress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartUpdateRequest'
+      responses:
+        '200':
+          description: Shipping address set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /me/orders:
+    post:
+      tags: [me-controller]
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+components:
+  schemas:
+
+    CreateCustomerRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    CreateCartRequest:
+      type: object
+      properties:
+        customerId:
+          type: string
+        currency:
+          type: string
+        country:
+          type: string
+
+    CartUpdateRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+        streetName:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+        shippingMethodId:
+          type: string
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        cartId:
+          type: string
+
+    CartResponse:
+      type: object
+      properties:
+        cartId:
+          type: string
+        totalPrice:
+          type: integer
+          description: Price in cents
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+
+    LineItem:
+      type: object
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+
+    CustomerResponse:
+      type: object
+      properties:
+        customerId:
+          type: string
+        email:
+          type: string
+
+    OrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+        orderState:
+          type: string
