@@ -21,7 +21,7 @@ public class AdminService {
     @Value("${ct.projectKey}")
     private String projectKey;
 
-    // ===================== CART =====================
+   
 
     public Object getCart(String cartId) {
         log.info("Fetching cart with id: {}", cartId);
@@ -38,14 +38,13 @@ public class AdminService {
         return adminFeignClient.deleteCart(projectKey, cartId, version);
     }
 
-    // ===================== LINE ITEM =====================
+
 
     public Object addLineItem(String cartId, CartUpdateRequest request) {
         log.info("Adding line item to cart: {}", cartId);
         return adminFeignClient.updateCart(projectKey, cartId, request);
     }
 
-    // ===================== ADDRESS =====================
 
     public Object addShippingAddress(String cartId, Long version, CartUpdateRequest.Address address) {
 
@@ -67,7 +66,7 @@ public class AdminService {
         );
     }
 
-    // ===================== SHIPPING METHOD =====================
+
 
     public Object getShippingMethods(String cartId) {
         log.info("Fetching shipping methods for cart: {}", cartId);
@@ -99,7 +98,6 @@ public class AdminService {
         );
     }
 
-    // ===================== ORDER =====================
 
     public Object createOrder(String cartId, Long version) {
 
