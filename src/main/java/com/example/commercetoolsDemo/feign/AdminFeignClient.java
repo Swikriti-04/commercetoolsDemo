@@ -1,42 +1,48 @@
 package com.example.commercetoolsDemo.feign;
 
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartDraft;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.customer.Customer;
+import com.commercetools.api.models.customer.CustomerDraft;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.config.AdminFeignConfig;
+
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-
 @FeignClient(
-        name = "admin-client",
+        name = "adminClient",
         url = "${ct.apiUrl}",
-         configuration = AdminFeignConfig.class)
+        configuration = AdminFeignConfig.class
+)
 public interface AdminFeignClient {
 
-
     @PostMapping("/{projectKey}/customers")
-    Map<String, Object> createCustomer(
-            @PathVariable("projectKey") String projectKey,
-            @RequestBody Map<String, Object> body
+    Customer createCustomer(
+            @PathVariable String projectKey,
+            @RequestBody CustomerDraft request
     );
-
 
     @PostMapping("/{projectKey}/carts")
-    Map<String, Object> createCart(
-            @PathVariable("projectKey") String projectKey,
-            @RequestBody Map<String, Object> body
+    Cart createCart(
+            @PathVariable String projectKey,
+            @RequestBody CartDraft request
     );
+
 
     @PostMapping("/{projectKey}/carts/{cartId}")
-    Map<String, Object> updateCart(
-            @PathVariable("projectKey") String projectKey,
-            @PathVariable("cartId") String cartId,
-            @RequestBody Map<String, Object> body
+    Cart updateCart(
+            @PathVariable String projectKey,
+            @PathVariable String cartId,
+            @RequestBody CartUpdate request
     );
-
 
     @PostMapping("/{projectKey}/orders")
-    Map<String, Object> createOrder(
-            @PathVariable("projectKey") String projectKey,
-            @RequestBody Map<String, Object> body
+    Order createOrder(
+            @PathVariable String projectKey,
+            @RequestBody OrderFromCartDraft request
     );
+
 }

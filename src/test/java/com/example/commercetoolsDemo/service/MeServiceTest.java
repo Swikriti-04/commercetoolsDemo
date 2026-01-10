@@ -1,19 +1,26 @@
 package com.example.commercetoolsDemo.service;
 
-import com.example.commercetoolsDemo.dto.request.CartUpdateRequest;
-import com.example.commercetoolsDemo.dto.request.CreateOrderRequest;
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartBuilder;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderBuilder;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.feign.MeFeignClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MeServiceTest {
@@ -30,64 +37,41 @@ class MeServiceTest {
     @BeforeEach
     void setup() {
         ReflectionTestUtils.setField(meService, "projectKey", "test-project");
-        when(tokenService.getAdminAccessToken()).thenReturn("token");
     }
 
     @Test
     void getActiveCart_success() {
-        Map<String, Object> cart = Map.of(
-                "id", "cart-1",
-                "version", 1L,
-                "totalPrice", Map.of("centAmount", 1000),
-                "lineItems", List.of()
-        );
 
-        when(meFeignClient.getActiveCart(eq("test-project"), anyString()))
-                .thenReturn(cart);
+        when(tokenService.getCustomerAccessToken())
+                .thenReturn("mock-token");
 
-        Map<String, Object> result = meService.getActiveCart();
-
-        assertEquals("cart-1", result.get("cartId"));
-        assertEquals(1000, result.get("totalPrice"));
-    }
-
-    @Test
-    void addLineItem_success() {
-        CartUpdateRequest request = CartUpdateRequest.builder()
-                .productId("prod-1")
-                .quantity(2L)
-                .version(1L)
+        Cart cart = CartBuilder.of()
+                .id("cart-1")
                 .build();
 
-        when(meFeignClient.updateMyCart(anyString(), anyString(), anyString(), anyMap()))
-                .thenReturn(Map.of(
-                        "id", "cart-1",
-                        "version", 2L,
-                        "totalPrice", Map.of("centAmount", 2000),
-                        "lineItems", List.of()
-                ));
+        when(meFeignClient.getActiveCart(anyString(), anyString()))
+                .thenReturn(cart);
 
-        Map<String, Object> result = meService.addLineItem(request);
+        Cart result = meService.getActiveCart();
 
-        assertEquals(2L, result.get("version"));
+        assertEquals("cart-1", result.getId());
     }
 
     @Test
     void createOrder_success() {
-        CreateOrderRequest request = CreateOrderRequest.builder()
-                .cartId("cart-1")
-                .version(2L)
+
+        when(tokenService.getCustomerAccessToken())
+                .thenReturn("mock-token");
+
+        Order order = OrderBuilder.of()
+                .id("order-1")
                 .build();
 
-        when(meFeignClient.createOrder(anyString(), anyString(), anyMap()))
-                .thenReturn(Map.of(
-                        "id", "order-1",
-                        "orderState", "Confirmed"
-                ));
+        when(meFeignClient.createOrder(anyString(), anyString(), any()))
+                .thenReturn(order);
 
-        Map<String, Object> result = meService.createOrder(request);
+        Order result = meService.createOrder(any());
 
-        assertEquals("order-1", result.get("orderId"));
-        assertEquals("Confirmed", result.get("orderState"));
+        assertEquals("order-1", result.getId());
     }
 }

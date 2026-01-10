@@ -1,7 +1,9 @@
 package com.example.commercetoolsDemo.controller;
 
-import com.example.commercetoolsDemo.dto.request.CartUpdateRequest;
-import com.example.commercetoolsDemo.dto.request.CreateOrderRequest;
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.service.MeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,31 +18,27 @@ public class MeController {
         this.meService = meService;
     }
 
-
     @GetMapping("/carts/active")
-    public ResponseEntity<?> getActiveCart() {
+    public ResponseEntity<Cart> getActiveCart() {
         return ResponseEntity.ok(meService.getActiveCart());
     }
 
+    @PostMapping("/carts/{cartId}")
+    public ResponseEntity<Cart> updateCart(
+            @PathVariable String cartId,
+            @RequestBody CartUpdate request) {
 
-    @PostMapping("/carts/line-items")
-    public ResponseEntity<?> addLineItem(
-            @RequestBody CartUpdateRequest request) {
-
-        return ResponseEntity.ok(meService.addLineItem(request));
-    }
-
-    @PostMapping("/carts/shipping-address")
-    public ResponseEntity<?> setShippingAddress(
-            @RequestBody CartUpdateRequest request) {
-
-        return ResponseEntity.ok(meService.setShippingAddress(request));
+        return ResponseEntity.ok(
+                meService.updateCart(cartId, request)
+        );
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<?> createOrder(
-            @RequestBody CreateOrderRequest request) {
+    public ResponseEntity<Order> createOrder(
+            @RequestBody OrderFromCartDraft request) {
 
-        return ResponseEntity.ok(meService.createOrder(request));
+        return ResponseEntity.ok(
+                meService.createOrder(request)
+        );
     }
 }

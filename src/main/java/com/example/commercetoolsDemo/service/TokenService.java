@@ -1,59 +1,59 @@
 package com.example.commercetoolsDemo.service;
 
+import com.example.commercetoolsDemo.dto.response.TokenResponse;
 import com.example.commercetoolsDemo.feign.AuthFeignClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Base64;
-import java.util.Map;
 
 @Service
 public class TokenService {
 
-    @Value("${ct.clientId}")
-    private String clientId;
-
-    @Value("${ct.clientSecret}")
-    private String clientSecret;
-
-    @Value("${ct.scopes}")
-    private String scope;
-
     private final AuthFeignClient authFeignClient;
+    private final Environment environment;
 
-    private String accessToken;
-    private Instant expiryTime;
-
-    public TokenService(AuthFeignClient authFeignClient) {
+    public TokenService(AuthFeignClient authFeignClient, Environment environment) {
         this.authFeignClient = authFeignClient;
+        this.environment = environment;
     }
 
-    public synchronized String getAdminAccessToken() {
+    public String getAdminAccessToken() {
+        String basicAuth = buildBasicAuthHeader();
 
-        if (accessToken == null || Instant.now().isAfter(expiryTime)) {
-            fetchToken();
-        }
-        return accessToken;
+        TokenResponse response = authFeignClient.getToken(
+                basicAuth,
+                "client_credentials",
+                getProperty("ct.scope")
+        );
+
+        return response.getAccess_token();
     }
 
-    private void fetchToken() {
+    public String getCustomerAccessToken() {
+        String basicAuth = buildBasicAuthHeader();
 
-        String basicAuth = "Basic " + Base64.getEncoder()
-                .encodeToString((clientId + ":" + clientSecret)
-                        .getBytes(StandardCharsets.UTF_8));
+        TokenResponse response = authFeignClient.getCustomerToken(
+                basicAuth,
+                "password",
+                getProperty("ct.customer.email"),
+                getProperty("ct.customer.password"),
+                getProperty("ct.scope")
+        );
 
-        Map<String, Object> response =
-                authFeignClient.getToken(
-                        basicAuth,
-                        "client_credentials",
-                        scope
-                );
+        return response.getAccess_token();
+    }
 
-        this.accessToken = (String) response.get("access_token");
-        Integer expiresIn = (Integer) response.get("expires_in");
+    private String buildBasicAuthHeader() {
+        String credentials =
+                getProperty("ct.clientId") + ":" + getProperty("ct.clientSecret");
 
-        this.expiryTime = Instant.now().plusSeconds(expiresIn - 60);
+        return "Basic " + Base64.getEncoder()
+                .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String getProperty(String key) {
+        return environment.getProperty(key, "");
     }
 }

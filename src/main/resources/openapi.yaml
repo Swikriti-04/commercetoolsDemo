@@ -1,16 +1,25 @@
 openapi: 3.0.1
+
 info:
-  title: Commercetools Demo API
-  version: v1
+  title: Commercetools Admin & Me API
+  version: v0
+
 servers:
   - url: http://localhost:8080
-    description: Local server
+    description: Generated server url
+
+
+security:
+  - bearerAuth: []
 
 paths:
 
+
+
   /admin/customers:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: createCustomer
       requestBody:
         required: true
@@ -20,15 +29,16 @@ paths:
               $ref: '#/components/schemas/CreateCustomerRequest'
       responses:
         '200':
-          description: Customer created
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                type: object
 
   /admin/carts:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: createCart
       requestBody:
         required: true
@@ -38,15 +48,16 @@ paths:
               $ref: '#/components/schemas/CreateCartRequest'
       responses:
         '200':
-          description: Cart created
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartResponse'
+                type: object
 
   /admin/carts/{cartId}/line-items:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: addLineItem
       parameters:
         - name: cartId
@@ -54,23 +65,30 @@ paths:
           required: true
           schema:
             type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartUpdateRequest'
+              $ref: '#/components/schemas/AddLineItemAction'
       responses:
         '200':
-          description: Line item added
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartResponse'
+                type: object
 
   /admin/carts/{cartId}/shipping-address:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: setShippingAddress
       parameters:
         - name: cartId
@@ -78,23 +96,30 @@ paths:
           required: true
           schema:
             type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartUpdateRequest'
+              $ref: '#/components/schemas/SetShippingAddressAction'
       responses:
         '200':
-          description: Shipping address set
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartResponse'
+                type: object
 
   /admin/carts/{cartId}/shipping-method:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: setShippingMethod
       parameters:
         - name: cartId
@@ -102,23 +127,29 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CartUpdateRequest'
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: shippingMethodId
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Shipping method set
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartResponse'
+                type: object
 
   /admin/orders:
     post:
-      tags: [admin-controller]
+      tags:
+        - admin-controller
       operationId: createOrder
       requestBody:
         required: true
@@ -128,7 +159,27 @@ paths:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
         '200':
-          description: Order created
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+
+  /me/orders:
+    post:
+      tags:
+        - me-controller
+      operationId: createMyOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -136,71 +187,87 @@ paths:
 
   /me/carts/active:
     get:
-      tags: [me-controller]
+      tags:
+        - me-controller
       operationId: getActiveCart
       responses:
         '200':
-          description: Active cart
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
 
-  /me/carts/line-items:
+  /me/carts/{cartId}/line-items:
     post:
-      tags: [me-controller]
-      operationId: addLineItem
+      tags:
+        - me-controller
+      operationId: addLineItemToMyCart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartUpdateRequest'
+              $ref: '#/components/schemas/AddLineItemAction'
       responses:
         '200':
-          description: Line item added
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
 
-  /me/carts/shipping-address:
+  /me/carts/{cartId}/shipping-address:
     post:
-      tags: [me-controller]
-      operationId: setShippingAddress
+      tags:
+        - me-controller
+      operationId: setMyShippingAddress
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartUpdateRequest'
+              $ref: '#/components/schemas/SetShippingAddressAction'
       responses:
         '200':
-          description: Shipping address set
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
-
-  /me/orders:
-    post:
-      tags: [me-controller]
-      operationId: createOrder
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
-      responses:
-        '200':
-          description: Order created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderResponse'
 
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
 
     CreateCustomerRequest:
@@ -225,13 +292,44 @@ components:
         country:
           type: string
 
-    CartUpdateRequest:
+    CreateOrderRequest:
       type: object
+      properties:
+        cartId:
+          type: string
+        version:
+          type: integer
+          format: int64
+
+
+
+    AddLineItemAction:
+      type: object
+      required:
+        - productId
+        - quantity
       properties:
         productId:
           type: string
+        variantId:
+          type: integer
+          format: int64
         quantity:
           type: integer
+          format: int64
+
+    SetShippingAddressAction:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+
+
+    Address:
+      type: object
+      properties:
         streetName:
           type: string
         city:
@@ -242,48 +340,36 @@ components:
           type: string
         country:
           type: string
-        shippingMethodId:
-          type: string
 
-    CreateOrderRequest:
-      type: object
-      properties:
-        cartId:
-          type: string
 
     CartResponse:
       type: object
       properties:
-        cartId:
+        id:
           type: string
-        totalPrice:
+        version:
           type: integer
-          description: Price in cents
+          format: int64
+        totalPrice:
+          $ref: '#/components/schemas/Price'
         lineItems:
           type: array
           items:
-            $ref: '#/components/schemas/LineItem'
-
-    LineItem:
-      type: object
-      properties:
-        productId:
-          type: string
-        quantity:
-          type: integer
-
-    CustomerResponse:
-      type: object
-      properties:
-        customerId:
-          type: string
-        email:
-          type: string
+            type: object
 
     OrderResponse:
       type: object
       properties:
-        orderId:
+        id:
+          type: string
+        orderNumber:
           type: string
         orderState:
           type: string
+
+    Price:
+      type: object
+      properties:
+        centAmount:
+          type: integer
+          format: int64

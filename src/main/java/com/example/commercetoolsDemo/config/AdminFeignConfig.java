@@ -1,10 +1,11 @@
 package com.example.commercetoolsDemo.config;
-
 import com.example.commercetoolsDemo.service.TokenService;
 import feign.RequestInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Slf4j
 @Configuration
 public class AdminFeignConfig {
 
@@ -18,7 +19,7 @@ public class AdminFeignConfig {
     public RequestInterceptor adminRequestInterceptor() {
         return requestTemplate -> {
             String accessToken = tokenService.getAdminAccessToken();
-            System.out.println("USING TOKEN = " + accessToken);
+            log.debug("USING TOKEN = {}", accessToken);
 
             requestTemplate.header("Authorization", "Bearer " + accessToken);
             requestTemplate.header("Content-Type", "application/json");

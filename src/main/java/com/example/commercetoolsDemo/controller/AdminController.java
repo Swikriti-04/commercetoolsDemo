@@ -1,9 +1,10 @@
 package com.example.commercetoolsDemo.controller;
 
-import com.example.commercetoolsDemo.dto.request.CartUpdateRequest;
-import com.example.commercetoolsDemo.dto.request.CreateCartRequest;
-import com.example.commercetoolsDemo.dto.request.CreateCustomerRequest;
-import com.example.commercetoolsDemo.dto.request.CreateOrderRequest;
+import com.commercetools.api.models.cart.*;
+import com.commercetools.api.models.customer.CustomerDraft;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
+import com.example.commercetoolsDemo.model.*;
 import com.example.commercetoolsDemo.service.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,59 +19,30 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-
     @PostMapping("/customers")
     public ResponseEntity<?> createCustomer(
-            @RequestBody CreateCustomerRequest request) {
+            @RequestBody CustomerDraft request) {
 
         return ResponseEntity.ok(adminService.createCustomer(request));
     }
 
-
     @PostMapping("/carts")
-    public ResponseEntity<?> createCart(
-            @RequestBody CreateCartRequest request) {
-
+    public ResponseEntity<Cart> createCart(
+            @RequestBody CartDraft request) {
         return ResponseEntity.ok(adminService.createCart(request));
     }
 
 
-    @PostMapping("/carts/{cartId}/line-items")
-    public ResponseEntity<?> addLineItem(
+    @PostMapping("/carts/{cartId}")
+    public ResponseEntity<Cart> updateCart(
             @PathVariable String cartId,
-            @RequestBody CartUpdateRequest request) {
-
-        return ResponseEntity.ok(
-                adminService.addLineItem(cartId, request)
-        );
-    }
-
-
-    @PostMapping("/carts/{cartId}/shipping-address")
-    public ResponseEntity<?> setShippingAddress(
-            @PathVariable String cartId,
-            @RequestBody CartUpdateRequest request) {
-
-        return ResponseEntity.ok(
-                adminService.setShippingAddress(cartId, request)
-        );
-    }
-
-
-    @PostMapping("/carts/{cartId}/shipping-method")
-    public ResponseEntity<?> setShippingMethod(
-            @PathVariable String cartId,
-            @RequestBody CartUpdateRequest request) {
-
-        return ResponseEntity.ok(
-                adminService.setShippingMethod(cartId, request)
-        );
+            @RequestBody CartUpdate update) {
+        return ResponseEntity.ok(adminService.updateCart(cartId, update));
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<?> createOrder(
-            @RequestBody CreateOrderRequest request) {
-
+    public ResponseEntity<Order> createOrder(
+            @RequestBody OrderFromCartDraft request) {
         return ResponseEntity.ok(adminService.createOrder(request));
     }
 }

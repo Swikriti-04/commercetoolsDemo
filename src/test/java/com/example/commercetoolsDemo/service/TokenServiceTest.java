@@ -1,58 +1,58 @@
 package com.example.commercetoolsDemo.service;
 
+import com.example.commercetoolsDemo.dto.response.TokenResponse;
 import com.example.commercetoolsDemo.feign.AuthFeignClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.Instant;
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+@ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
 
     @Mock
     private AuthFeignClient authFeignClient;
+
+    @Mock
+    private Environment environment;
 
     @InjectMocks
     private TokenService tokenService;
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        ReflectionTestUtils.setField(tokenService, "clientId", "client");
-        ReflectionTestUtils.setField(tokenService, "clientSecret", "secret");
-        ReflectionTestUtils.setField(tokenService, "scope", "manage_project");
+        when(environment.getProperty("ct.clientId", ""))
+                .thenReturn("id");
+        when(environment.getProperty("ct.clientSecret", ""))
+                .thenReturn("secret");
+        when(environment.getProperty("ct.scope", ""))
+                .thenReturn("scope");
     }
 
     @Test
-    void getAdminAccessToken_fetchesNewToken_whenExpired() {
-        when(authFeignClient.getToken(anyString(), anyString(), anyString()))
-                .thenReturn(Map.of(
-                        "access_token", "new-token",
-                        "expires_in", 3600
-                ));
+    void fetchesNewToken_whenExpired() {
+
+        TokenResponse response = new TokenResponse();
+        response.setAccess_token("token");
+        response.setExpires_in(3600);
+
+        when(authFeignClient.getToken(
+                anyString(),
+                anyString(),
+                anyString()
+        )).thenReturn(response);
 
         String token = tokenService.getAdminAccessToken();
 
-        assertEquals("new-token", token);
-        verify(authFeignClient, times(1))
-                .getToken(anyString(), eq("client_credentials"), anyString());
-    }
-
-    @Test
-    void getAdminAccessToken_returnsCachedToken() {
-        ReflectionTestUtils.setField(tokenService, "accessToken", "cached-token");
-        ReflectionTestUtils.setField(tokenService, "expiryTime",
-                Instant.now().plusSeconds(600));
-
-        String token = tokenService.getAdminAccessToken();
-
-        assertEquals("cached-token", token);
-        verifyNoInteractions(authFeignClient);
+        assertEquals("token", token);
     }
 }
+
