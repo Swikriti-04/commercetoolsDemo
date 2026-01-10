@@ -16,21 +16,19 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // ===================== CART =====================
-
-    // 1️⃣ Get Cart
+    
     @GetMapping("/cart/{id}")
     public ResponseEntity<Object> getCart(@PathVariable String id) {
         return ResponseEntity.ok(adminService.getCart(id));
     }
 
-    // 2️⃣ Create Cart
+
     @PostMapping("/cart")
     public ResponseEntity<Object> createCart(@RequestBody CreateCartRequest body) {
         return ResponseEntity.ok(adminService.createCart(body));
     }
 
-    // 3️⃣ Delete Cart
+
     @DeleteMapping("/cart/{id}")
     public ResponseEntity<Object> deleteCart(
             @PathVariable String id,
@@ -39,9 +37,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.deleteCart(id, version));
     }
 
-    // ===================== LINE ITEM =====================
 
-    // 4️⃣ Add Line Item
     @PostMapping("/cart/{id}/line-item")
     public ResponseEntity<Object> addLineItem(
             @PathVariable String id,
@@ -50,9 +46,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.addLineItem(id, request));
     }
 
-    // ===================== ADDRESS =====================
 
-    // 5️⃣ Set Shipping Address (FULL ADDRESS OBJECT)
     @PostMapping("/cart/{id}/shipping-address")
     public ResponseEntity<Object> setShippingAddress(
             @PathVariable String id,
@@ -64,15 +58,13 @@ public class AdminController {
         );
     }
 
-    // ===================== SHIPPING METHOD =====================
-
-    // 6️⃣ Get Shipping Methods for Cart
+    
     @GetMapping("/cart/{id}/shipping-methods")
     public ResponseEntity<Object> getShippingMethods(@PathVariable String id) {
         return ResponseEntity.ok(adminService.getShippingMethods(id));
     }
 
-    // 7️⃣ Set Shipping Method (MANDATORY before order)
+
     @PostMapping("/cart/{id}/shipping-method")
     public ResponseEntity<Object> setShippingMethod(
             @PathVariable String id,
@@ -84,9 +76,7 @@ public class AdminController {
         );
     }
 
-    // ===================== ORDER =====================
-
-    // 8️⃣ Create Order
+    
     @PostMapping("/order")
     public ResponseEntity<Object> createOrder(
             @RequestParam String cartId,
