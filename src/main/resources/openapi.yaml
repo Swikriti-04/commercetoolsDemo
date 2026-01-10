@@ -1,0 +1,375 @@
+openapi: 3.0.1
+
+info:
+  title: Commercetools Admin & Me API
+  version: v0
+
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+
+
+security:
+  - bearerAuth: []
+
+paths:
+
+
+
+  /admin/customers:
+    post:
+      tags:
+        - admin-controller
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/carts:
+    post:
+      tags:
+        - admin-controller
+      operationId: createCart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCartRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/carts/{cartId}/line-items:
+    post:
+      tags:
+        - admin-controller
+      operationId: addLineItem
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLineItemAction'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/carts/{cartId}/shipping-address:
+    post:
+      tags:
+        - admin-controller
+      operationId: setShippingAddress
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetShippingAddressAction'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/carts/{cartId}/shipping-method:
+    post:
+      tags:
+        - admin-controller
+      operationId: setShippingMethod
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: shippingMethodId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /admin/orders:
+    post:
+      tags:
+        - admin-controller
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+
+  /me/orders:
+    post:
+      tags:
+        - me-controller
+      operationId: createMyOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+  /me/carts/active:
+    get:
+      tags:
+        - me-controller
+      operationId: getActiveCart
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /me/carts/{cartId}/line-items:
+    post:
+      tags:
+        - me-controller
+      operationId: addLineItemToMyCart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLineItemAction'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+  /me/carts/{cartId}/shipping-address:
+    post:
+      tags:
+        - me-controller
+      operationId: setMyShippingAddress
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetShippingAddressAction'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    CreateCustomerRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    CreateCartRequest:
+      type: object
+      properties:
+        customerId:
+          type: string
+        currency:
+          type: string
+        country:
+          type: string
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        cartId:
+          type: string
+        version:
+          type: integer
+          format: int64
+
+
+
+    AddLineItemAction:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+        variantId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int64
+
+    SetShippingAddressAction:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+
+
+    Address:
+      type: object
+      properties:
+        streetName:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+
+    CartResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int64
+        totalPrice:
+          $ref: '#/components/schemas/Price'
+        lineItems:
+          type: array
+          items:
+            type: object
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        orderNumber:
+          type: string
+        orderState:
+          type: string
+
+    Price:
+      type: object
+      properties:
+        centAmount:
+          type: integer
+          format: int64

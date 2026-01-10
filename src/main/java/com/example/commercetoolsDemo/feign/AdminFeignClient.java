@@ -1,13 +1,17 @@
 package com.example.commercetoolsDemo.feign;
 
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartDraft;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.customer.Customer;
+import com.commercetools.api.models.customer.CustomerDraft;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.config.AdminFeignConfig;
-import com.example.commercetoolsDemo.dto.request.CartUpdateRequest;
-import com.example.commercetoolsDemo.dto.request.CreateCartRequest;
-import com.example.commercetoolsDemo.dto.request.CreateOrderRequest;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
 
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
 @FeignClient(
         name = "adminClient",
         url = "${ct.apiUrl}",
@@ -15,56 +19,30 @@ import org.springframework.web.bind.annotation.*;
 )
 public interface AdminFeignClient {
 
-    // 1️⃣ Get Cart
-    @GetMapping("/{projectKey}/carts/{id}")
-    Object getCart(
+    @PostMapping("/{projectKey}/customers")
+    Customer createCustomer(
             @PathVariable String projectKey,
-            @PathVariable String id
+            @RequestBody CustomerDraft request
     );
 
-    // 2️⃣ Create Cart
-    @PostMapping(
-            value = "/{projectKey}/carts",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Object createCart(
+    @PostMapping("/{projectKey}/carts")
+    Cart createCart(
             @PathVariable String projectKey,
-            @RequestBody CreateCartRequest body
+            @RequestBody CartDraft request
     );
 
-    // 3️⃣ Delete Cart
-    @DeleteMapping("/{projectKey}/carts/{id}")
-    Object deleteCart(
+
+    @PostMapping("/{projectKey}/carts/{cartId}")
+    Cart updateCart(
             @PathVariable String projectKey,
-            @PathVariable String id,
-            @RequestParam("version") Long version
+            @PathVariable String cartId,
+            @RequestBody CartUpdate request
     );
 
-    // 4️⃣ Update Cart (generic)
-    @PostMapping(
-            value = "/{projectKey}/carts/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Object updateCart(
+    @PostMapping("/{projectKey}/orders")
+    Order createOrder(
             @PathVariable String projectKey,
-            @PathVariable String id,
-            @RequestBody CartUpdateRequest body
+            @RequestBody OrderFromCartDraft request
     );
 
-    // 5️⃣ Get Shipping Methods for Cart
-    @GetMapping("/{projectKey}/shipping-methods")
-    Object getShippingMethods(
-            @PathVariable String projectKey,
-            @RequestParam("cartId") String cartId
-    );
-
-    // 6️⃣ Create Order
-    @PostMapping(
-            value = "/{projectKey}/orders",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Object createOrder(
-            @PathVariable String projectKey,
-            @RequestBody CreateOrderRequest request
-    );
 }

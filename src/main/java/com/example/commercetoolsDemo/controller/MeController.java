@@ -1,38 +1,44 @@
 package com.example.commercetoolsDemo.controller;
 
-import com.example.commercetoolsDemo.dto.request.CreateCartRequest;
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.service.MeService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/me")
-@RequiredArgsConstructor
 public class MeController {
 
     private final MeService meService;
 
-    @GetMapping("/cart")
-    public Object getMyCarts(
-            @RequestHeader("Authorization") String token
-    ) {
-        return meService.getMyCarts(token);
+    public MeController(MeService meService) {
+        this.meService = meService;
     }
 
-    @PostMapping("/cart")
-    public Object createMyCart(
-            @RequestHeader("Authorization") String token,
-            @RequestBody CreateCartRequest body
-    ) {
-        return meService.createMyCart(token, body);
+    @GetMapping("/carts/active")
+    public ResponseEntity<Cart> getActiveCart() {
+        return ResponseEntity.ok(meService.getActiveCart());
     }
 
-    @DeleteMapping("/cart/{id}")
-    public Object deleteMyCart(
-            @PathVariable String id,
-            @RequestParam Long version,
-            @RequestHeader("Authorization") String token
-    ) {
-        return meService.deleteMyCart(id, version, token);
+    @PostMapping("/carts/{cartId}")
+    public ResponseEntity<Cart> updateCart(
+            @PathVariable String cartId,
+            @RequestBody CartUpdate request) {
+
+        return ResponseEntity.ok(
+                meService.updateCart(cartId, request)
+        );
+    }
+
+    @PostMapping("/orders")
+    public ResponseEntity<Order> createOrder(
+            @RequestBody OrderFromCartDraft request) {
+
+        return ResponseEntity.ok(
+                meService.createOrder(request)
+        );
     }
 }

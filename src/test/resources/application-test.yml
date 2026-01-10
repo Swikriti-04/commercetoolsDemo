@@ -1,0 +1,6 @@
+ct:
+  projectKey: test-project
+  authUrl: http://test-auth
+  clientId: test-client
+  clientSecret: test-secret
+  scope: test-scope

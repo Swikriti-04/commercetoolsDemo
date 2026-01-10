@@ -1,37 +1,33 @@
 package com.example.commercetoolsDemo.feign;
 
-import com.example.commercetoolsDemo.dto.request.CreateCartRequest;
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(
-        name = "meClient",
-        url = "${ct.apiUrl}"
-)
+@FeignClient(name = "me-client", url = "${ct.apiUrl}")
 public interface MeFeignClient {
 
-    @GetMapping("/{projectKey}/me/carts")
-    Object getMyCarts(
+    @GetMapping("/{projectKey}/me/active-cart")
+    Cart getActiveCart(
             @PathVariable String projectKey,
-            @RequestHeader("Authorization") String token
+            @RequestHeader("Authorization") String authorization
     );
 
-    @PostMapping(
-            value = "/{projectKey}/me/carts",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    Object createMyCart(
+    @PostMapping("/{projectKey}/me/carts/{cartId}")
+    Cart updateMyCart(
             @PathVariable String projectKey,
-            @RequestHeader("Authorization") String token,
-            @RequestBody CreateCartRequest body
+            @PathVariable String cartId,
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody CartUpdate body
     );
 
-    @DeleteMapping("/{projectKey}/me/carts/{id}")
-    Object deleteMyCart(
+    @PostMapping("/{projectKey}/me/orders")
+    Order createOrder(
             @PathVariable String projectKey,
-            @PathVariable String id,
-            @RequestParam("version") Long version,
-            @RequestHeader("Authorization") String token
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody OrderFromCartDraft body
     );
 }

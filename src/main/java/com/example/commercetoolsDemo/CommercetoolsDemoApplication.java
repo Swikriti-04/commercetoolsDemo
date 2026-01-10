@@ -8,8 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class CommercetoolsDemoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CommercetoolsDemoApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(CommercetoolsDemoApplication.class, args);
+    }
 }

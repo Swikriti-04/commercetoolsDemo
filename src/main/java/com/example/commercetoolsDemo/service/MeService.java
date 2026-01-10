@@ -1,29 +1,48 @@
 package com.example.commercetoolsDemo.service;
 
-import com.example.commercetoolsDemo.dto.request.CreateCartRequest;
+import com.commercetools.api.models.cart.Cart;
+import com.commercetools.api.models.cart.CartUpdate;
+import com.commercetools.api.models.order.Order;
+import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.feign.MeFeignClient;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class MeService {
 
     private final MeFeignClient meFeignClient;
+    private final TokenService tokenService;
 
     @Value("${ct.projectKey}")
     private String projectKey;
 
-    public Object getMyCarts(String token) {
-        return meFeignClient.getMyCarts(projectKey, token);
+    public MeService(MeFeignClient meFeignClient, TokenService tokenService) {
+        this.meFeignClient = meFeignClient;
+        this.tokenService = tokenService;
     }
 
-    public Object createMyCart(String token, CreateCartRequest body) {
-        return meFeignClient.createMyCart(projectKey, token, body);
+    public Cart getActiveCart() {
+        return meFeignClient.getActiveCart(
+                projectKey,
+                "Bearer " + tokenService.getCustomerAccessToken()
+        );
     }
 
-    public Object deleteMyCart(String id, Long version, String token) {
-        return meFeignClient.deleteMyCart(projectKey, id, version, token);
+    public Cart updateCart(String cartId, CartUpdate request) {
+        return meFeignClient.updateMyCart(
+                projectKey,
+                cartId,
+                "Bearer " + tokenService.getCustomerAccessToken(),
+                request
+        );
+    }
+
+    public Order createOrder(OrderFromCartDraft request) {
+        return meFeignClient.createOrder(
+                projectKey,
+                "Bearer " + tokenService.getCustomerAccessToken(),
+                request
+        );
     }
 }
