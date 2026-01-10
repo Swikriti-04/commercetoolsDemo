@@ -32,9 +32,7 @@ public class TokenService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    /**
-     * Returns a valid admin token (cached or fresh).
-     */
+    
     public synchronized String getAdminToken() {
 
         if (accessToken == null || isTokenExpired()) {
@@ -45,9 +43,7 @@ public class TokenService {
         return accessToken;
     }
 
-    /**
-     * Calls commercetools OAuth server using client_credentials flow.
-     */
+  
     private void fetchNewToken() {
 
         try {
@@ -84,7 +80,7 @@ public class TokenService {
                 throw new IllegalStateException("Invalid token response: " + responseBody);
             }
 
-            // safety buffer of 60 seconds
+            
             expiryTime = Instant.now().plusSeconds(expiresIn - 60);
 
             log.info("Admin token fetched successfully, expires in {} seconds", expiresIn);
@@ -96,9 +92,7 @@ public class TokenService {
         }
     }
 
-    /**
-     * Checks if cached token is expired.
-     */
+    
     private boolean isTokenExpired() {
         return expiryTime == null || Instant.now().isAfter(expiryTime);
     }
