@@ -2,8 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-
-    // ✅ OpenAPI Generator
     id "org.openapi.generator" version "7.3.0"
 }
 

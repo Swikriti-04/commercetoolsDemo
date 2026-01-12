@@ -19,41 +19,42 @@ public class TokenService {
         this.environment = environment;
     }
 
+
     public String getAdminAccessToken() {
-        String basicAuth = buildBasicAuthHeader();
-
         TokenResponse response = authFeignClient.getToken(
-                basicAuth,
+                buildBasicAuthHeader(),
                 "client_credentials",
-                getProperty("ct.scope")
+                getRequiredProperty("ct.scopes")
         );
-
         return response.getAccess_token();
     }
 
+
     public String getCustomerAccessToken() {
-        String basicAuth = buildBasicAuthHeader();
-
         TokenResponse response = authFeignClient.getCustomerToken(
-                basicAuth,
+                buildBasicAuthHeader(),
                 "password",
-                getProperty("ct.customer.email"),
-                getProperty("ct.customer.password"),
-                getProperty("ct.scope")
+                getRequiredProperty("ct.customer.email"),
+                getRequiredProperty("ct.customer.password"),
+                getRequiredProperty("ct.scopes")
         );
-
         return response.getAccess_token();
     }
 
     private String buildBasicAuthHeader() {
         String credentials =
-                getProperty("ct.clientId") + ":" + getProperty("ct.clientSecret");
+                getRequiredProperty("ct.clientId") + ":" +
+                        getRequiredProperty("ct.clientSecret");
 
         return "Basic " + Base64.getEncoder()
                 .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String getProperty(String key) {
-        return environment.getProperty(key, "");
+    private String getRequiredProperty(String key) {
+        String value = environment.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Missing required property: " + key);
+        }
+        return value;
     }
 }

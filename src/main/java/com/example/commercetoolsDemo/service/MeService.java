@@ -5,6 +5,9 @@ import com.commercetools.api.models.cart.CartUpdate;
 import com.commercetools.api.models.order.Order;
 import com.commercetools.api.models.order.OrderFromCartDraft;
 import com.example.commercetoolsDemo.feign.MeFeignClient;
+import com.example.commercetoolsDemo.mapper.CartOrderMapper;
+import com.example.commercetoolsDemo.model.CartResponse;
+import com.example.commercetoolsDemo.model.OrderResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,27 +25,30 @@ public class MeService {
         this.tokenService = tokenService;
     }
 
-    public Cart getActiveCart() {
-        return meFeignClient.getActiveCart(
+    public CartResponse getActiveCart() {
+        Cart cart = meFeignClient.getActiveCart(
                 projectKey,
                 "Bearer " + tokenService.getCustomerAccessToken()
         );
+        return CartOrderMapper.toCartResponse(cart);
     }
 
-    public Cart updateCart(String cartId, CartUpdate request) {
-        return meFeignClient.updateMyCart(
+    public CartResponse updateCart(String cartId, CartUpdate request) {
+        Cart cart = meFeignClient.updateMyCart(
                 projectKey,
                 cartId,
                 "Bearer " + tokenService.getCustomerAccessToken(),
                 request
         );
+        return CartOrderMapper.toCartResponse(cart);
     }
 
-    public Order createOrder(OrderFromCartDraft request) {
-        return meFeignClient.createOrder(
+    public OrderResponse createOrder(OrderFromCartDraft request) {
+        Order order = meFeignClient.createOrder(
                 projectKey,
                 "Bearer " + tokenService.getCustomerAccessToken(),
                 request
         );
+        return CartOrderMapper.toOrderResponse(order);
     }
 }

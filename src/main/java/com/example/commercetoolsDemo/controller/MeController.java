@@ -1,9 +1,9 @@
 package com.example.commercetoolsDemo.controller;
 
-import com.commercetools.api.models.cart.Cart;
 import com.commercetools.api.models.cart.CartUpdate;
-import com.commercetools.api.models.order.Order;
 import com.commercetools.api.models.order.OrderFromCartDraft;
+import com.example.commercetoolsDemo.model.CartResponse;
+import com.example.commercetoolsDemo.model.OrderResponse;
 import com.example.commercetoolsDemo.service.MeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,26 +19,20 @@ public class MeController {
     }
 
     @GetMapping("/carts/active")
-    public ResponseEntity<Cart> getActiveCart() {
+    public ResponseEntity<CartResponse> getActiveCart() {
         return ResponseEntity.ok(meService.getActiveCart());
     }
 
     @PostMapping("/carts/{cartId}")
-    public ResponseEntity<Cart> updateCart(
+    public ResponseEntity<CartResponse> updateCart(
             @PathVariable String cartId,
             @RequestBody CartUpdate request) {
-
-        return ResponseEntity.ok(
-                meService.updateCart(cartId, request)
-        );
+        return ResponseEntity.ok(meService.updateCart(cartId, request));
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<Order> createOrder(
+    public ResponseEntity<OrderResponse> createOrder(
             @RequestBody OrderFromCartDraft request) {
-
-        return ResponseEntity.ok(
-                meService.createOrder(request)
-        );
+        return ResponseEntity.ok(meService.createOrder(request));
     }
 }
