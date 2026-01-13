@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Inventory Service API
+  version: 1.0.0
+
+paths:
+  /inventory/{skuId}:
+    get:
+      operationId: getInventory
+      parameters:
+        - name: skuId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inventory available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryResponse'
+        '404':
+          description: SKU not found
+
+  /inventory/{skuId}/reduce:
+    post:
+      operationId: reduceInventory
+      parameters:
+        - name: skuId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: quantity
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Inventory reduced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryResponse'
+        '400':
+          description: Insufficient inventory
+        '404':
+          description: SKU not found
+
+components:
+  schemas:
+    InventoryResponse:
+      type: object
+      required:
+        - skuId
+        - availableQuantity
+      properties:
+        skuId:
+          type: string
+        availableQuantity:
+          type: integer
